@@ -1,0 +1,82 @@
+.watupro-practice {
+	padding:10px;	
+}
+
+.watupro-for-removal {
+	background:#CCC;
+	color:#777;
+	font-style:italic;
+}
+
+.watupro-sortable li {
+	border: 1pt dashed #DDD;
+	padding:5px;
+	cursor: move;
+	margin-bottom: 5px;
+}
+
+.watupro-sortable-horizontal {
+	list-style-type: none;
+	width: 80%;
+	clear: both;
+}
+
+.watupro-sortable-horizontal li {
+	float:left;
+	margin: 3px 3px 3px 0; 
+	min-width: 100px; 
+}
+
+.watupro-matrix-right {
+	float:left;width:100%;clear:both;
+}
+
+.watupro-matrix-draggable {
+	float:left;
+	min-width:100px;
+	padding:5px;
+	border:1px dashed #999;
+	margin: 5px;
+	cursor: move;
+}
+
+.watupro-matrix-left-cell, .watupro-matrix-right-cell {
+	width: 50%;
+	vertical-align: middle;
+}
+
+.watupro-droppable-hover {
+	background-color: #eee;	
+}
+
+.watupro-gap {
+	display: inline !important;
+	max-width: 100px !important;
+}
+
+.watupro-sortable-choices {
+	width: 100%;
+	overflow: auto;	
+	clear: both;
+}
+
+.watupro-nmatrix-unselect {
+	text-align: center;
+	display: none;
+}
+
+.watupro-nmatrix-selected > .watupro-nmatrix-unselect {
+	display: block;
+}
+
+.watupro-nmatrix-selected {
+	border: 2pt solid green;
+}
+
+.watupro-nmatrix-hidden {
+	display: none;
+}
+
+.watupro-personality-chart td {
+	padding: 6px;
+}
