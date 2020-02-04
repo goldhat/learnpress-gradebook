@@ -17,7 +17,7 @@ class LearnPressGradeBookClasses {
 
 		$meta_boxes[] = array(
 			'id' => 'gradebook_class_metabox',
-			'title' => esc_html__( 'Add Users to Class', 'learnpress-gradebook' ),
+			'title' => esc_html__( 'GradeBook Settings', 'learnpress-gradebook' ),
 			'post_types' => array('gradebook_class'),
 			'context' => 'after_title',
 			'priority' => 'default',
@@ -26,14 +26,25 @@ class LearnPressGradeBookClasses {
 				array(
 					'id' => $prefix . 'user',
 					'type' => 'user',
-					'name' => esc_html__( 'User', 'learnpress-gradebook' ),
+					'name' => esc_html__( 'Select Users', 'learnpress-gradebook' ),
 					'field_type' => 'select_advanced',
 					'multiple' => true
 				),
 				array(
-					'id' => $prefix . 'button_2',
+					'id' => $prefix . 'exam_selection',
+					'name' => esc_html__( 'Select Exams', 'metabox-online-generator' ),
+					'type' => 'select_advanced',
+					'multiple' => true,
+					'placeholder' => esc_html__( 'Select an Item', 'metabox-online-generator' ),
+					'options' => array(
+						1 => esc_html__( 'Exam 1', 'metabox-online-generator' ),
+						2 => esc_html__( 'Exam 2', 'metabox-online-generator' ),
+					),
+				),
+				array(
+					'id' => $prefix . 'export',
 					'type' => 'button',
-					'name' => esc_html__( 'Button', 'metabox-online-generator' ),
+					'std' => 'Export GradeBook'
 				),
 			),
 
@@ -80,16 +91,16 @@ class LearnPressGradeBookClasses {
 			'labels'                => $labels,
 			'supports'              => array( 'title' ),
 			'hierarchical'          => false,
-			'public'                => true,
+			'public'                => false,
 			'show_ui'               => true,
 			'show_in_menu'          => true,
-			'menu_position'         => 5,
+			'menu_position'         => 25,
 			'show_in_admin_bar'     => true,
 			'show_in_nav_menus'     => true,
 			'can_export'            => true,
 			'has_archive'           => true,
 			'exclude_from_search'   => false,
-			'publicly_queryable'    => true,
+			'publicly_queryable'    => false,
 			'capability_type'       => 'page',
 		);
 		register_post_type( 'gradebook_class', $args );
