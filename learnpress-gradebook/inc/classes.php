@@ -7,36 +7,39 @@ class LearnPressGradeBookClasses {
 		add_action('init', array('LearnPressGradeBookClasses', 'register'));
 		add_filter( 'rwmb_meta_boxes', array('LearnPressGradeBookClasses', 'metaboxes'));
 
+
+
 	}
 
 	public static function metaboxes() {
 
 		$prefix = 'gradebook_class_';
 
-	$meta_boxes[] = array(
-		'id' => 'gradebook_class_metabox',
-		'title' => esc_html__( 'Add Users to Class', 'learnpress-gradebook' ),
-		'post_types' => array('gradebook_class'),
-		'context' => 'after_title',
-		'priority' => 'default',
-		'autosave' => 'false',
-		'fields' => array(
-			array(
-				'id' => $prefix . 'user',
-				'type' => 'user',
-				'name' => esc_html__( 'User', 'learnpress-gradebook' ),
-				'field_type' => 'select_advanced',
-				'multiple' => true
+		$meta_boxes[] = array(
+			'id' => 'gradebook_class_metabox',
+			'title' => esc_html__( 'Add Users to Class', 'learnpress-gradebook' ),
+			'post_types' => array('gradebook_class'),
+			'context' => 'after_title',
+			'priority' => 'default',
+			'autosave' => 'false',
+			'fields' => array(
+				array(
+					'id' => $prefix . 'user',
+					'type' => 'user',
+					'name' => esc_html__( 'User', 'learnpress-gradebook' ),
+					'field_type' => 'select_advanced',
+					'multiple' => true
+				),
+				array(
+					'id' => $prefix . 'button_2',
+					'type' => 'button',
+					'name' => esc_html__( 'Button', 'metabox-online-generator' ),
+				),
 			),
-			array(
-				'id' => $prefix . 'button_2',
-				'type' => 'button',
-				'name' => esc_html__( 'Button', 'metabox-online-generator' ),
-			),
-		),
-	);
 
-	return $meta_boxes;
+		);
+
+		return $meta_boxes;
 
 	}
 
