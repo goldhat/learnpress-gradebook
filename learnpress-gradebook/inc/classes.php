@@ -54,7 +54,7 @@ class LearnPressGradeBookClasses {
 			fputcsv($f, $line);
 		}
 		fseek($f, 0);
-		header('Content-Type: application/csv');
+		header("Content-type: application/csv", true, 200);
 		header('Content-Disposition: attachment; filename="gradebook-export-' . $postId . '".csv;');
 		fpassthru($f);
 
@@ -126,7 +126,10 @@ class LearnPressGradeBookClasses {
 				array(
 					'id' => $prefix . 'export',
 					'type' => 'button',
-					'std' => 'Export GradeBook'
+					'std' => 'Export GradeBook',
+					'attributes' => array(
+						'data-href' =>' /downloads/data.csv'
+					)
 				),
 			),
 

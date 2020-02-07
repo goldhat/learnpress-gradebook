@@ -25,6 +25,31 @@ class LearnPressGradeBook {
 
 		LearnPressGradeBookClasses::init();
 
+		add_action( 'template_redirect',array('LearnPressGradeBook', 'downloadReport'));
+		add_action( 'rwmb_enqueue_scripts', array('LearnPressGradeBook', 'script'));
+
+	}
+
+	public static function script() {
+
+		wp_enqueue_script(
+			'script-id',
+			LEARNPRESS_GRADEBOOK_URL . '/admin.js', 
+			array( 'jquery' ),
+			'',
+			true
+		);
+
+	}
+
+	public static function downloadReport() {
+
+		if ( $_SERVER['REQUEST_URI'] == '/downloads/data.csv' ) {
+			$gbc = new LearnPressGradeBookClasses;
+			$gbc->createReport( 190 );
+    	exit();
+  	}
+
 	}
 
 }
