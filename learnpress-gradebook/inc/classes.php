@@ -9,9 +9,96 @@ class LearnPressGradeBookClasses {
 
 	}
 
+	public function createReport( $postId ) {
+
+		// get the exams in class
+		$exams = rwmb_meta( 'gradebook_class_exam_selection', '', $postId );
+
+		// get the users in class
+		$users = rwmb_meta( 'gradebook_class_user_selection', '', $postId );
+
+		// create csv data array with header row
+		$csvData = [];
+		$csvRow = array('Name', 'Username', 'Email', 'User ID');
+		foreach( $exams as $examId ) {
+			$csvRow[] = $this->fetchExamName( $examId );
+		}
+		$csvData[] = $csvRow;
+
+		// loop over users and exams to get scores
+		foreach( $users as $userId ) {
+
+			$csvRow = [];
+
+			$user = get_userdata( $userId );
+			$csvRow[] = $user->first_name . ' ' . $user->last_name;
+			$csvRow[] = $user->user_login;
+			$csvRow[] = $user->user_email;
+			$csvRow[] = $userId;
+
+			foreach( $exams as $examId ) {
+				$examResult = $this->fetchExamResultUser( $userId, $examId );
+				if( $examResult ) {
+					$csvRow[] = $examResult->percent_correct;
+				} else {
+					$csvRow[] = '-';
+				}
+			}
+
+			$csvData[] = $csvRow;
+
+		}
+
+		$f = fopen('php://memory', 'w');
+		foreach($csvData as $line) {
+			fputcsv($f, $line);
+		}
+		fseek($f, 0);
+		header('Content-Type: application/csv');
+		header('Content-Disposition: attachment; filename="gradebook-export-' . $postId . '".csv;');
+		fpassthru($f);
+
+	}
+
+	public function fetchExamName( $examId ) {
+
+		global $wpdb;
+		$result = $wpdb->get_col(
+			$wpdb->prepare("SELECT name FROM wp_watupro_master
+			WHERE id=%d
+			LIMIT 1",
+			$examId
+		));
+		return $result[0];
+
+	}
+
+	public function fetchExamResultUser( $userId, $examId ) {
+
+		global $wpdb;
+		$results = $wpdb->get_row(
+			$wpdb->prepare("SELECT tak.percent_correct FROM wp_watupro_taken_exams AS tak
+			WHERE tak.user_id=%d
+			AND tak.exam_id=%d
+			ORDER BY tak.percent_correct DESC LIMIT 1",
+			$userId, $examId
+		));
+		if( empty( $results )) {
+			return false;
+		}
+		return $results;
+
+	}
+
 	public static function metaboxes() {
 
 		$prefix = 'gradebook_class_';
+
+		$exams = LearnPressGradeBookClasses::fetchExams();
+		$examChoices = [];
+		foreach( $exams as $exam ) {
+			$examChoices[ $exam->id ] = $exam->name;
+		}
 
 		$meta_boxes[] = array(
 			'id' => 'gradebook_class_metabox',
@@ -22,7 +109,7 @@ class LearnPressGradeBookClasses {
 			'autosave' => 'false',
 			'fields' => array(
 				array(
-					'id' => $prefix . 'user',
+					'id' => $prefix . 'user_selection',
 					'type' => 'user',
 					'name' => esc_html__( 'Select Users', 'learnpress-gradebook' ),
 					'field_type' => 'select_advanced',
@@ -34,10 +121,7 @@ class LearnPressGradeBookClasses {
 					'type' => 'select_advanced',
 					'multiple' => true,
 					'placeholder' => esc_html__( 'Select an Item', 'metabox-online-generator' ),
-					'options' => array(
-						1 => esc_html__( 'Exam 1', 'metabox-online-generator' ),
-						2 => esc_html__( 'Exam 2', 'metabox-online-generator' ),
-					),
+					'options' => $examChoices,
 				),
 				array(
 					'id' => $prefix . 'export',
@@ -49,6 +133,14 @@ class LearnPressGradeBookClasses {
 		);
 
 		return $meta_boxes;
+
+	}
+
+	public static function fetchExams() {
+
+		global $wpdb;
+		$exams = $wpdb->get_results("SELECT id, name FROM wp_watupro_master");
+		return $exams;
 
 	}
 

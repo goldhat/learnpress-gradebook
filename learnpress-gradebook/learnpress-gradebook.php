@@ -16,25 +16,14 @@
 define('LEARNPRESS_GRADEBOOK_PATH', plugin_dir_path( __FILE__ ));
 define('LEARNPRESS_GRADEBOOK_URL', plugin_dir_url( __FILE__ ));
 
-
 class LearnPressGradeBook {
 
 	public function __construct() {
 
-		require( LEARNPRESS_GRADEBOOK_PATH . '/inc/meta-box/meta-box.php');
-		require( LEARNPRESS_GRADEBOOK_PATH . '/inc/classes.php');
+		require_once( LEARNPRESS_GRADEBOOK_PATH . '/inc/meta-box/meta-box.php');
+		require_once( LEARNPRESS_GRADEBOOK_PATH . '/inc/classes.php');
 
 		LearnPressGradeBookClasses::init();
-
-		add_action( 'init', array('LearnPressGradeBook', 'fetchExams'), 120 );
-
-	}
-
-	public static function fetchExams() {
-
-		global $wpdb;
-		$exams = $wpdb->get_results("SELECT id, name FROM wp_watupro_master");
-		return $exams;
 
 	}
 
