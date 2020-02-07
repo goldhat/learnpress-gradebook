@@ -92,6 +92,12 @@ class LearnPressGradeBookClasses {
 
 	public static function metaboxes() {
 
+		if( isset( $_REQUEST['post'] )) {
+			$postId = $_REQUEST['post'];
+		} else {
+			$postId = false;
+		}
+
 		$prefix = 'gradebook_class_';
 
 		$exams = LearnPressGradeBookClasses::fetchExams();
@@ -123,17 +129,23 @@ class LearnPressGradeBookClasses {
 					'placeholder' => esc_html__( 'Select an Item', 'metabox-online-generator' ),
 					'options' => $examChoices,
 				),
-				array(
-					'id' => $prefix . 'export',
-					'type' => 'button',
-					'std' => 'Export GradeBook',
-					'attributes' => array(
-						'data-href' =>' /downloads/data.csv'
-					)
-				),
 			),
 
 		);
+
+		end( $meta_boxes );
+		$key = key( $meta_boxes );
+
+		if( $postId ) {
+			$meta_boxes[ $key ]['fields'][] = array(
+				'id' => $prefix . 'export',
+				'type' => 'button',
+				'std' => 'Export GradeBook',
+				'attributes' => array(
+					'data-href' => '/gradebook/export/' . $postId
+				)
+			);
+		}
 
 		return $meta_boxes;
 
@@ -150,16 +162,16 @@ class LearnPressGradeBookClasses {
 	public static function register() {
 
 		$labels = array(
-			'name'                  => _x( 'GradeBook Classes', 'Post Type General Name', '' ),
-			'singular_name'         => _x( 'GradeBook Class', 'Post Type Singular Name', '' ),
-			'menu_name'             => __( 'GradeBook Classes', '' ),
-			'name_admin_bar'        => __( 'GradeBook Classes', '' ),
+			'name'                  => _x( 'GradeBooks', 'Post Type General Name', '' ),
+			'singular_name'         => _x( 'GradeBook', 'Post Type Singular Name', '' ),
+			'menu_name'             => __( 'GradeBooks', '' ),
+			'name_admin_bar'        => __( 'GradeBooks', '' ),
 			'archives'              => __( 'Item Archives', '' ),
 			'attributes'            => __( 'Item Attributes', '' ),
 			'parent_item_colon'     => __( 'Parent Item:', '' ),
-			'all_items'             => __( 'All Items', '' ),
-			'add_new_item'          => __( 'Add New Item', '' ),
-			'add_new'               => __( 'Add New', '' ),
+			'all_items'             => __( 'All GradeBooks', '' ),
+			'add_new_item'          => __( 'Add New GradeBook', '' ),
+			'add_new'               => __( 'Add New GradeBook', '' ),
 			'new_item'              => __( 'New Item', '' ),
 			'edit_item'             => __( 'Edit Item', '' ),
 			'update_item'           => __( 'Update Item', '' ),
@@ -179,7 +191,7 @@ class LearnPressGradeBookClasses {
 			'filter_items_list'     => __( 'Filter items list', '' ),
 		);
 		$args = array(
-			'label'                 => __( 'GradeBook Class', '' ),
+			'label'                 => __( 'GradeBooks', '' ),
 			'description'           => __( 'Post Type Description', '' ),
 			'labels'                => $labels,
 			'supports'              => array( 'title' ),
@@ -187,7 +199,8 @@ class LearnPressGradeBookClasses {
 			'public'                => false,
 			'show_ui'               => true,
 			'show_in_menu'          => true,
-			'menu_position'         => 25,
+			'menu_position'         => 155,
+			'menu_icon'							=> 'dashicons-editor-kitchensink',
 			'show_in_admin_bar'     => true,
 			'show_in_nav_menus'     => true,
 			'can_export'            => true,

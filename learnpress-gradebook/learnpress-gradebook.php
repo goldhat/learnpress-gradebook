@@ -34,7 +34,7 @@ class LearnPressGradeBook {
 
 		wp_enqueue_script(
 			'script-id',
-			LEARNPRESS_GRADEBOOK_URL . '/admin.js', 
+			LEARNPRESS_GRADEBOOK_URL . '/admin.js',
 			array( 'jquery' ),
 			'',
 			true
@@ -44,9 +44,10 @@ class LearnPressGradeBook {
 
 	public static function downloadReport() {
 
-		if ( $_SERVER['REQUEST_URI'] == '/downloads/data.csv' ) {
+		if( substr( $_SERVER['REQUEST_URI'], 0, 18 ) == '/gradebook/export/' ) {
+			$gradebookId = substr( $_SERVER['REQUEST_URI'], 18 );
 			$gbc = new LearnPressGradeBookClasses;
-			$gbc->createReport( 190 );
+			$gbc->createReport( $gradebookId );
     	exit();
   	}
 
