@@ -26,8 +26,6 @@ class LearnPressGradeBook {
 
 		LearnPressGradeBookClasses::init();
 
-		add_action( 'rwmb_enqueue_scripts', array('LearnPressGradeBook', 'scripts'));
-
 		add_action( 'init', array('LearnPressGradeBook', 'fetchExams'), 120 );
 
 	}
@@ -38,18 +36,6 @@ class LearnPressGradeBook {
 		$exams = $wpdb->get_results("SELECT id, name FROM wp_watupro_master");
 		return $exams;
 
-	}
-
-	public static function scripts() {
-
-	   wp_enqueue_script(
-			 'script-id',
-			 LEARNPRESS_GRADEBOOK_URL . '/js/admin.js',
-			 array( 'jquery' ),
-			 '',
-			 true
-		 );
-		 
 	}
 
 }

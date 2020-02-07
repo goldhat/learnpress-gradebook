@@ -7,8 +7,6 @@ class LearnPressGradeBookClasses {
 		add_action('init', array('LearnPressGradeBookClasses', 'register'));
 		add_filter( 'rwmb_meta_boxes', array('LearnPressGradeBookClasses', 'metaboxes'));
 
-
-
 	}
 
 	public static function metaboxes() {
