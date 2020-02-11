@@ -55,7 +55,7 @@ class LearnPressGradeBookClasses {
 		}
 		fseek($f, 0);
 		header("Content-type: application/csv", true, 200);
-		header('Content-Disposition: attachment; filename="gradebook-export-' . $postId . '".csv;');
+		header('Content-Disposition: attachment; filename=gradebook-export-' . $postId . '.csv');
 		fpassthru($f);
 
 	}
@@ -119,7 +119,10 @@ class LearnPressGradeBookClasses {
 					'type' => 'user',
 					'name' => esc_html__( 'Select Users', 'learnpress-gradebook' ),
 					'field_type' => 'select_advanced',
-					'multiple' => true
+					'multiple' => true,
+					'query_args' => array(
+						'number' => -1
+					)
 				),
 				array(
 					'id' => $prefix . 'exam_selection',
