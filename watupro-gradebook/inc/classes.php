@@ -17,6 +17,8 @@ class WatuProGradeBookClasses {
 		// get the users in class
 		$users = rwmb_meta( 'gradebook_class_user_selection', '', $postId );
 
+		$customFilename = rwmb_meta( 'gradebook_class_filename', '', $postId );
+
 		// create csv data array with header row
 		$csvData = [];
 		$csvRow = array('Name', 'Username', 'Email', 'User ID');
@@ -55,7 +57,21 @@ class WatuProGradeBookClasses {
 		}
 		fseek($f, 0);
 		header("Content-type: application/csv", true, 200);
-		header('Content-Disposition: attachment; filename=gradebook-export-' . $postId . '.csv');
+
+		if( $customFilename == '' ) {
+			$filename = 'gradebook-[title]';
+		} else {
+			$filename = $customFilename;
+		}
+
+		// process placeholders
+		$postTitle = get_the_title( $postId );
+		$title = str_replace( ' ', '-', $postTitle );
+		$title = strtolower( $title );
+		$filename = str_replace('[title]', $title, $filename);
+
+		// do export
+		header('Content-Disposition: attachment; filename=' . $filename . '.csv');
 		fpassthru($f);
 
 	}
@@ -126,11 +142,18 @@ class WatuProGradeBookClasses {
 				),
 				array(
 					'id' => $prefix . 'exam_selection',
-					'name' => esc_html__( 'Select Exams', 'metabox-online-generator' ),
+					'name' => esc_html__( 'Select Exams', 'watupro-gradebook' ),
 					'type' => 'select_advanced',
 					'multiple' => true,
-					'placeholder' => esc_html__( 'Select an Item', 'metabox-online-generator' ),
+					'placeholder' => esc_html__( 'Select an Item', 'watupro-gradebook' ),
 					'options' => $examChoices,
+				),
+				array(
+					'id' => $prefix . 'filename',
+					'name' => esc_html__( 'Set Export Filename', 'watupro-gradebook' ),
+					'type' => 'text',
+					'placeholder' => esc_html__( 'gradebook-[title]', 'watupro-gradebook' ),
+					'append' => '.csv'
 				),
 			),
 
