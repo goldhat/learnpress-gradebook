@@ -1,11 +1,11 @@
 <?php
 
-class LearnPressGradeBookClasses {
+class WatuProGradeBookClasses {
 
 	public static function init() {
 
-		add_action('init', array('LearnPressGradeBookClasses', 'register'));
-		add_filter( 'rwmb_meta_boxes', array('LearnPressGradeBookClasses', 'metaboxes'));
+		add_action('init', array('WatuProGradeBookClasses', 'register'));
+		add_filter( 'rwmb_meta_boxes', array('WatuProGradeBookClasses', 'metaboxes'));
 
 	}
 
@@ -100,7 +100,7 @@ class LearnPressGradeBookClasses {
 
 		$prefix = 'gradebook_class_';
 
-		$exams = LearnPressGradeBookClasses::fetchExams();
+		$exams = WatuProGradeBookClasses::fetchExams();
 		$examChoices = [];
 		foreach( $exams as $exam ) {
 			$examChoices[ $exam->id ] = $exam->name;
@@ -108,7 +108,7 @@ class LearnPressGradeBookClasses {
 
 		$meta_boxes[] = array(
 			'id' => 'gradebook_class_metabox',
-			'title' => esc_html__( 'GradeBook Settings', 'learnpress-gradebook' ),
+			'title' => esc_html__( 'GradeBook Settings', 'watupro-gradebook' ),
 			'post_types' => array('gradebook_class'),
 			'context' => 'after_title',
 			'priority' => 'default',
@@ -117,7 +117,7 @@ class LearnPressGradeBookClasses {
 				array(
 					'id' => $prefix . 'user_selection',
 					'type' => 'user',
-					'name' => esc_html__( 'Select Users', 'learnpress-gradebook' ),
+					'name' => esc_html__( 'Select Users', 'watupro-gradebook' ),
 					'field_type' => 'select_advanced',
 					'multiple' => true,
 					'query_args' => array(

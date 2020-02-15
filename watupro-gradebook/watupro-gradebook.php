@@ -1,32 +1,32 @@
 <?php
 
 /**
- * Plugin Name:			LearnPress GradeBook
+ * Plugin Name:			WatuPro GradeBook
  * Plugin URI:			http://eatbuildplay.com
  * Description:			Organize quizzes and students into gradebooks for swift reporting.
  * Version:					1.0.0
  * Author:					Casey Milne, Eat/Build/Play
  * Author URI:			http://eatbuildplay.com
  *
- * Text Domain: learnpress-gradebook
+ * Text Domain: watupro-gradebook
  * Domain Path: /languages/
  *
  */
 
-define('LEARNPRESS_GRADEBOOK_PATH', plugin_dir_path( __FILE__ ));
-define('LEARNPRESS_GRADEBOOK_URL', plugin_dir_url( __FILE__ ));
+define('WATUPRO_GRADEBOOK_PATH', plugin_dir_path( __FILE__ ));
+define('WATUPRO_GRADEBOOK_URL', plugin_dir_url( __FILE__ ));
 
-class LearnPressGradeBook {
+class WatuProGradeBook {
 
 	public function __construct() {
 
-		require_once( LEARNPRESS_GRADEBOOK_PATH . '/inc/meta-box/meta-box.php');
-		require_once( LEARNPRESS_GRADEBOOK_PATH . '/inc/classes.php');
+		require_once( WATUPRO_GRADEBOOK_PATH . '/inc/meta-box/meta-box.php');
+		require_once( WATUPRO_GRADEBOOK_PATH . '/inc/classes.php');
 
-		LearnPressGradeBookClasses::init();
+		WatuProGradeBookClasses::init();
 
-		add_action( 'template_redirect',array('LearnPressGradeBook', 'downloadReport'));
-		add_action( 'rwmb_enqueue_scripts', array('LearnPressGradeBook', 'script'));
+		add_action( 'template_redirect',array('WatuProGradeBook', 'downloadReport'));
+		add_action( 'rwmb_enqueue_scripts', array('WatuProGradeBook', 'script'));
 
 	}
 
@@ -34,7 +34,7 @@ class LearnPressGradeBook {
 
 		wp_enqueue_script(
 			'script-id',
-			LEARNPRESS_GRADEBOOK_URL . '/admin.js',
+			WATUPRO_GRADEBOOK_URL . '/admin.js',
 			array( 'jquery' ),
 			'',
 			true
@@ -46,7 +46,7 @@ class LearnPressGradeBook {
 
 		if( substr( $_SERVER['REQUEST_URI'], 0, 18 ) == '/gradebook/export/' ) {
 			$gradebookId = substr( $_SERVER['REQUEST_URI'], 18 );
-			$gbc = new LearnPressGradeBookClasses;
+			$gbc = new WatuProGradeBookClasses;
 			$gbc->createReport( $gradebookId );
     	exit();
   	}
@@ -55,4 +55,4 @@ class LearnPressGradeBook {
 
 }
 
-new LearnPressGradeBook;
+new WatuProGradeBook;
