@@ -30,6 +30,16 @@ class WatuProGradeBook {
 
 	}
 
+	public static function initCronSchedule() {
+
+		$timestamp = wp_next_scheduled( 'watu_gradebook_reporter' );
+
+		if( $timestamp == false ) {
+		  wp_schedule_event( time(), 'daily', 'watu_gradebook_reporter' );
+		}
+
+	}
+
 	public static function script() {
 
 		wp_enqueue_script(
@@ -56,3 +66,8 @@ class WatuProGradeBook {
 }
 
 new WatuProGradeBook;
+
+/*
+ * Cron scheduling
+ */
+register_activation_hook( '__FILE__', array('WatuProGradeBook', 'initCronSchedule'));
