@@ -2,6 +2,14 @@
 
 class WatuProGradeBookClasses {
 
+	public $postId;
+	public $exams;
+	public $users;
+	public $exportFilenameSetting;
+	public $exportFilename;
+	public $csvData;
+	public $csvFile;
+
 	public static function init() {
 
 		add_action('init', array('WatuProGradeBookClasses', 'register'));
@@ -9,70 +17,160 @@ class WatuProGradeBookClasses {
 
 	}
 
-	public function createReport( $postId ) {
+	public function setPostId( $postId ) {
+		$this->postId = $postId;
+	}
 
-		// get the exams in class
-		$exams = rwmb_meta( 'gradebook_class_exam_selection', '', $postId );
+	public function loadExams() {
+		$this->exams = rwmb_meta( 'gradebook_class_exam_selection', '', $this->postId );
+	}
 
-		// get the users in class
-		$users = rwmb_meta( 'gradebook_class_user_selection', '', $postId );
+	public function loadUsers() {
+		$this->users = rwmb_meta( 'gradebook_class_user_selection', '', $this->postId );
+	}
 
-		$customFilename = rwmb_meta( 'gradebook_class_filename', '', $postId );
+	public function loadExportFilename() {
+		$this->exportFilenameSetting = rwmb_meta( 'gradebook_class_filename', '', $this->postId );
+	}
 
-		// create csv data array with header row
-		$csvData = [];
-		$csvRow = array('Name', 'Username', 'Email', 'User ID');
-		foreach( $exams as $examId ) {
-			$csvRow[] = $this->fetchExamName( $examId );
+	public function makeHeaderRow() {
+		$headerRow = $this->reportHeaderRow();
+		$this->csvData[] = $headerRow;
+	}
+
+	public function reportHeaderRow() {
+		$headerRow = array('Name', 'Username', 'Email', 'User ID');
+		foreach( $this->exams as $examId ) {
+			$headerRow[] = $this->fetchExamName( $examId );
 		}
-		$csvData[] = $csvRow;
+		return $headerRow;
+	}
 
-		// loop over users and exams to get scores
-		foreach( $users as $userId ) {
+	public function makeUserRows() {
+		foreach( $this->users as $userId ) {
+			$this->makeUserRow( $userId );
+		}
+	}
 
-			$csvRow = [];
+	public function makeUserRow( $userId ) {
+		$csvRow = $this->reportUserRow( $userId );
+		$this->csvData[] = $csvRow;
+	}
 
-			$user = get_userdata( $userId );
-			$csvRow[] = $user->first_name . ' ' . $user->last_name;
-			$csvRow[] = $user->user_login;
-			$csvRow[] = $user->user_email;
-			$csvRow[] = $userId;
-
-			foreach( $exams as $examId ) {
-				$examResult = $this->fetchExamResultUser( $userId, $examId );
-				if( $examResult ) {
-					$csvRow[] = $examResult->percent_correct;
-				} else {
-					$csvRow[] = '-';
-				}
+	private function reportUserRow( $userId ) {
+		$csvRow = [];
+		$user = get_userdata( $userId );
+		$csvRow[] = $user->first_name . ' ' . $user->last_name;
+		$csvRow[] = $user->user_login;
+		$csvRow[] = $user->user_email;
+		$csvRow[] = $userId;
+		foreach( $this->exams as $examId ) {
+			$examResult = $this->fetchExamResultUser( $userId, $examId );
+			if( $examResult ) {
+				$csvRow[] = $examResult->percent_correct;
+			} else {
+				$csvRow[] = '-';
 			}
-
-			$csvData[] = $csvRow;
-
 		}
+		return $csvRow;
+	}
 
-		$f = fopen('php://memory', 'w');
-		foreach($csvData as $line) {
-			fputcsv($f, $line);
+	public function makeCsv() {
+		$this->csvFile = fopen('php://memory', 'w');
+		foreach($this->csvData as $line) {
+			fputcsv($this->csvFile, $line);
 		}
-		fseek($f, 0);
-		header("Content-type: application/csv", true, 200);
+		fseek($this->csvFile, 0);
+	}
 
-		if( $customFilename == '' ) {
+	public function makeExportFilename() {
+
+		// first set either the user choice or the default
+		if( $this->exportFilenameSetting == '' ) {
 			$filename = 'gradebook-[title]';
 		} else {
-			$filename = $customFilename;
+			$filename = $this->exportFilenameSetting;
 		}
 
 		// process placeholders
-		$postTitle = get_the_title( $postId );
-		$title = str_replace( ' ', '-', $postTitle );
-		$title = strtolower( $title );
-		$filename = str_replace('[title]', $title, $filename);
+		$postTitle = get_the_title( $this->postId );
+		$postTitle = str_replace( ' ', '-', $postTitle );
+		$postTitle = strtolower( $postTitle );
+		$filename = str_replace('[title]', $postTitle, $filename);
 
-		// do export
-		header('Content-Disposition: attachment; filename=' . $filename . '.csv');
-		fpassthru($f);
+		// set property
+		$this->exportFilename = $filename;
+
+	}
+
+	public function doCsvDownload() {
+		header("Content-type: application/csv",true,200);
+		header('Content-Disposition: attachment; filename=' . $this->exportFilename . '.csv');
+		fpassthru( $this->csvFile );
+	}
+
+	public function reportBuild() {
+		$report = get_post_meta( $this->postId, 'gradebook_report', 1 );
+		// add header if report currently empty
+		if( empty( $report )) {
+			$this->reportStart();
+		}
+		$this->reportAddLine();
+	}
+
+	/*
+	 * Add header line to saved report
+	 * Doing this clears existing report
+	 */
+	public function reportStart() {
+		$report = [];
+		$this->loadUsers();
+		$this->loadExams();
+		$report[] = $this->reportHeaderRow();
+		update_post_meta( $this->postId, 'gradebook_report', $report );
+	}
+
+	/*
+	 * Add 1 user report line to saved report
+	 */
+	public function reportAddLine() {
+		$report = get_post_meta( $this->postId, 'gradebook_report', 1 );
+		$this->loadUsers();
+		$this->loadExams();
+
+		$reportRowCount = count($report) -1;
+		$userCount = count( $this->users );
+
+		if( $reportRowCount >= $userCount ) {
+			update_post_meta($this->postId, 'gradebook_report_complete', 1);
+			return;
+		}
+		else {
+			$nextUserId = $this->users[ $reportRowCount ];
+			$report[] = $this->reportUserRow( $nextUserId );
+			update_post_meta( $this->postId, 'gradebook_report', $report );
+		}
+
+	}
+
+	public function exportReport() {
+
+		$this->csvData = get_post_meta( $this->postId, 'gradebook_report', 1 );
+
+		if( empty( $this->csvData )) {
+
+			print 'Sorry this report is not ready for export';
+			print '<pre>';
+			var_dump( $this->csvData );
+			print '</pre>';
+			wp_die();
+
+		}
+
+		$this->makeCsv();
+		$this->loadExportFilename();
+		$this->makeExportFilename();
+		$this->doCsvDownload();
 
 	}
 
@@ -114,6 +212,21 @@ class WatuProGradeBookClasses {
 			$postId = false;
 		}
 
+		/*
+		 * Create report status
+		 */
+		if( !$postId ) {
+			$reportStatus = '';
+		} else {
+			$report = get_post_meta( $postId, 'gradebook_report', 1 );
+			if( !$report || $report == '' || empty( $report ) ) {
+				$reportStatus = 'Report has not started running yet.';
+			} else {
+				$reportedRows = count($report) - 1;
+				$reportStatus = $reportedRows . ' total rows reported so far.';
+			}
+		}
+
 		$prefix = 'gradebook_class_';
 
 		$exams = WatuProGradeBookClasses::fetchExams();
@@ -147,6 +260,13 @@ class WatuProGradeBookClasses {
 					'multiple' => true,
 					'placeholder' => esc_html__( 'Select an Item', 'watupro-gradebook' ),
 					'options' => $examChoices,
+				),
+				array(
+			    'type' => 'divider',
+				),
+				array(
+			    'type' => 'custom_html',
+					'std'  => $reportStatus
 				),
 				array(
 					'id' => $prefix . 'filename',

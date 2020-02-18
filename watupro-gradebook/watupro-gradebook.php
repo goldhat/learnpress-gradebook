@@ -31,12 +31,20 @@ class WatuProGradeBook {
 		add_action( 'watu_gradebook_reporter', array('WatuProGradeBook', 'cronRun'));
 		add_filter( 'cron_schedules', array('WatuProGradeBook', 'cronSchedule'));
 
+		add_action( 'save_post_gradebook_class', array('WatuProGradeBook', 'savePost'), 10, 3 );
+
+	}
+
+	public static function savePost( $postId, $post, $update ) {
+
+		$gbc = new WatuProGradeBookClasses;
+		$gbc->setPostId( $postId );
+		$gbc->reportStart();
+		update_post_meta($postId, 'gradebook_report_complete', 0);
+
 	}
 
 	public static function cronRun() {
-
-		// test cron running
-		update_option( 'watupro_gradebook_log', time() );
 
 		// get gradebooks to run reports
 		$args = array(
@@ -46,32 +54,39 @@ class WatuProGradeBook {
 		$gradebooks = get_posts( $args );
 
 		// get one gradebook to report
-		$gradebook = $gradebook[0];
+		$reportingGradebook = false;
+		foreach( $gradebooks as $gradebook ) {
+			$isComplete = get_post_meta($gradebook->ID, 'gradebook_report_complete', 1);
+			if( !$isComplete ) {
+				$reportingGradebook = $gradebook;
+				break;
+			}
+		}
 
+		// check if no gradebooks to report
+		if( !$reportingGradebook ) {
+			return;
+		}
+
+		// do reporting
 		$gbc = new WatuProGradeBookClasses;
-		$gbc->createReport( $gradebook->ID );
-
-		/*
-		 * Break createReport() into smaller functions
-		 * We should be able to fetch just 1 user at a time
-		 * For now we can fetch all stats for 1 user
-		 * Whether we continue to fetch 2+ users is determined by how many exams
-		 */
+		$gbc->setPostId( $gradebook->ID );
+		$gbc->reportBuild();
 
 	}
 
 	public static function cronSchedule( $schedules ) {
-		if( !isset( $schedules['5min'] )) {
-			$schedules['5min'] = array(
-				'interval' => 5*60,
-				'display' => __('Every 5 minutes')
+		if( !isset( $schedules['1min'] )) {
+			$schedules['1min'] = array(
+				'interval' => 1*60,
+				'display' => __('Every minute')
 			);
     }
     return $schedules;
 	}
 
 	public static function initCronSchedule() {
-	  wp_schedule_event( time(), '5min', 'watu_gradebook_reporter' );
+	  wp_schedule_event( time(), '1min', 'watu_gradebook_reporter' );
 	}
 
 	public static function removeCronSchedule() {
@@ -98,7 +113,8 @@ class WatuProGradeBook {
 		if( substr( $_SERVER['REQUEST_URI'], 0, 18 ) == '/gradebook/export/' ) {
 			$gradebookId = substr( $_SERVER['REQUEST_URI'], 18 );
 			$gbc = new WatuProGradeBookClasses;
-			$gbc->createReport( $gradebookId );
+			$gbc->setPostId( $gradebookId );
+			$gbc->exportReport();
     	exit();
   	}
 
