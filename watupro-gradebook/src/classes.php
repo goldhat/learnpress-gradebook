@@ -14,6 +14,7 @@ class WatuProGradeBookClasses {
 
 		add_action('init', array('WatuProGradeBookClasses', 'register'));
 		add_filter( 'rwmb_meta_boxes', array('WatuProGradeBookClasses', 'metaboxes'));
+		add_filter( 'rwmb_gradebook_class_user_selection_value', array('WatuProGradeBookClasses', 'userSelectionSaveFilter'), 10, 2 );
 
 	}
 
@@ -204,6 +205,23 @@ class WatuProGradeBookClasses {
 
 	}
 
+	public static function userSelectionSaveFilter( $new, $field ) {
+
+		$postId = $_POST['post_ID'];
+		$users = get_post_meta( $postId, 'gradebook_class_user_selection' );
+
+		if( is_array( $users )) {
+			$users = array_merge( $users, $new );
+		} else {
+			$users = $new;
+		}
+
+		update_post_meta( $postId, 'gradebook_class_user_selection', $users );
+
+		return $new;
+
+	}
+
 	public static function metaboxes() {
 
 		if( isset( $_REQUEST['post'] )) {
@@ -235,6 +253,27 @@ class WatuProGradeBookClasses {
 			$examChoices[ $exam->id ] = $exam->name;
 		}
 
+		// make user table
+		$users = get_post_meta( $postId, $prefix . 'user_selection' );
+		$userRows = '';
+		foreach( $users as $uid ) {
+			$userRows .= '<tr>';
+			$userRows .= '<td>'. $uid . '</td>';
+			$userRows .= '</tr>';
+		}
+		$userTable = '
+			<table class="display stripe">
+				<thead>
+					<tr>
+						<th>Header</th>
+					</tr>
+				</thead>
+				<tbody>
+					' . $userRows . '
+				</tbody>
+			</table>
+		';
+
 		$meta_boxes[] = array(
 			'id' => 'gradebook_class_metabox',
 			'title' => esc_html__( 'GradeBook Settings', 'watupro-gradebook' ),
@@ -247,11 +286,18 @@ class WatuProGradeBookClasses {
 					'id' => $prefix . 'user_selection',
 					'type' => 'user',
 					'name' => esc_html__( 'Select Users', 'watupro-gradebook' ),
-					'field_type' => 'select_advanced',
+					'field_type' => 'checkbox_list',
 					'multiple' => true,
 					'query_args' => array(
 						'number' => -1
 					)
+				),
+				array(
+					'type' => 'custom_html',
+					'std'  => $userTable
+				),
+				array(
+			    'type' => 'divider',
 				),
 				array(
 					'id' => $prefix . 'exam_selection',

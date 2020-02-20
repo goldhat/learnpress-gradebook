@@ -107,6 +107,15 @@ class WatuProGradeBook {
 			true
 		);
 
+		$wp_scripts = wp_scripts();
+		wp_enqueue_style(
+      'jquery-ui-theme-smoothness',
+      sprintf(
+        '//ajax.googleapis.com/ajax/libs/jqueryui/%s/themes/smoothness/jquery-ui.css', // working for https as well now
+        $wp_scripts->registered['jquery-ui-core']->ver
+      )
+    );
+
 		// datatables stylesheet
 		wp_enqueue_style(
 			'datatables-style',
