@@ -20,8 +20,8 @@ class WatuProGradeBook {
 
 	public function __construct() {
 
-		require_once( WATUPRO_GRADEBOOK_PATH . '/inc/meta-box/meta-box.php');
-		require_once( WATUPRO_GRADEBOOK_PATH . '/inc/classes.php');
+		require_once( WATUPRO_GRADEBOOK_PATH . '/vendor/meta-box/meta-box.php');
+		require_once( WATUPRO_GRADEBOOK_PATH . '/src/classes.php');
 
 		WatuProGradeBookClasses::init();
 
