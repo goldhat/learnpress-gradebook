@@ -98,11 +98,30 @@ class WatuProGradeBook {
 
 	public static function script() {
 
+		// datatables script
 		wp_enqueue_script(
-			'script-id',
-			WATUPRO_GRADEBOOK_URL . '/admin.js',
+			'datatables-js',
+			WATUPRO_GRADEBOOK_URL . 'assets/datatables/datatables.min.js',
 			array( 'jquery' ),
-			'',
+			'1.10.20',
+			true
+		);
+
+		// datatables stylesheet
+		wp_enqueue_style(
+			'datatables-style',
+			WATUPRO_GRADEBOOK_URL . 'assets/datatables/datatables.min.css',
+			array(),
+			'1.10.20',
+			true
+		);
+
+		// main plugin script
+		wp_enqueue_script(
+			'watupro-gradebook',
+			WATUPRO_GRADEBOOK_URL . 'admin.js',
+			array( 'jquery' ),
+			'1.0.0',
 			true
 		);
 
