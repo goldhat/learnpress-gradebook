@@ -11,6 +11,11 @@ jQuery( function( $ ) {
 	    selector: 'tr',
 	    update: false,
     },
+		bFilter: false,
+		lengthChange: false,
+		bInfo: false,
+		bPaginate: false,
+		ordering: false
 	});
 
 	/*

@@ -9,6 +9,7 @@ class WatuProGradeBookClasses {
 	public $exportFilename;
 	public $csvData;
 	public $csvFile;
+	public $fieldPrefix = 'gradebook_class_';
 
 	public static function init() {
 
@@ -34,23 +35,15 @@ class WatuProGradeBookClasses {
 		$this->exportFilenameSetting = rwmb_meta( 'gradebook_class_filename', '', $this->postId );
 	}
 
-	public function makeHeaderRow() {
-		$headerRow = $this->reportHeaderRow();
-		$this->csvData[] = $headerRow;
-	}
-
 	public function reportHeaderRow() {
 		$headerRow = array('Name', 'Username', 'Email', 'User ID');
+		if( empty( $this->exams )) {
+			return $headerRow;
+		}
 		foreach( $this->exams as $examId ) {
 			$headerRow[] = $this->fetchExamName( $examId );
 		}
 		return $headerRow;
-	}
-
-	public function makeUserRows() {
-		foreach( $this->users as $userId ) {
-			$this->makeUserRow( $userId );
-		}
 	}
 
 	public function makeUserRow( $userId ) {
@@ -222,7 +215,10 @@ class WatuProGradeBookClasses {
 
 	}
 
-	public static function metaboxes() {
+	public static function metaboxes( $meta_boxes ) {
+
+		$obj = new WatuProGradeBookClasses;
+		$prefix = $obj->fieldPrefix;
 
 		if( isset( $_REQUEST['post'] )) {
 			$postId = $_REQUEST['post'];
@@ -234,7 +230,7 @@ class WatuProGradeBookClasses {
 		 * Create report status
 		 */
 		if( !$postId ) {
-			$reportStatus = '';
+			$reportStatus = 'No status yet.';
 		} else {
 			$report = get_post_meta( $postId, 'gradebook_report', 1 );
 			if( !$report || $report == '' || empty( $report ) ) {
@@ -245,8 +241,6 @@ class WatuProGradeBookClasses {
 			}
 		}
 
-		$prefix = 'gradebook_class_';
-
 		$exams = WatuProGradeBookClasses::fetchExams();
 		$examChoices = [];
 		foreach( $exams as $exam ) {
@@ -256,16 +250,23 @@ class WatuProGradeBookClasses {
 		// make user table
 		$users = get_post_meta( $postId, $prefix . 'user_selection' );
 		$userRows = '';
-		foreach( $users as $uid ) {
+		if( !empty( $users )) {
+			foreach( $users as $uid ) {
+				$userRows .= '<tr>';
+				$userRows .= '<td>'. $uid . '</td>';
+				$userRows .= '</tr>';
+			}
+		} else {
 			$userRows .= '<tr>';
-			$userRows .= '<td>'. $uid . '</td>';
+			$userRows .= '<td>No users currently in gradebook.</td>';
 			$userRows .= '</tr>';
 		}
+
 		$userTable = '
 			<table class="display stripe">
 				<thead>
 					<tr>
-						<th>Header</th>
+						<th>User ID</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -286,7 +287,7 @@ class WatuProGradeBookClasses {
 					'id' => $prefix . 'user_selection',
 					'type' => 'user',
 					'name' => esc_html__( 'Select Users', 'watupro-gradebook' ),
-					'field_type' => 'checkbox_list',
+					'field_type' => 'select_advanced',
 					'multiple' => true,
 					'query_args' => array(
 						'number' => -1
@@ -325,6 +326,7 @@ class WatuProGradeBookClasses {
 
 		);
 
+/*
 		end( $meta_boxes );
 		$key = key( $meta_boxes );
 
@@ -338,6 +340,7 @@ class WatuProGradeBookClasses {
 				)
 			);
 		}
+*/
 
 		return $meta_boxes;
 

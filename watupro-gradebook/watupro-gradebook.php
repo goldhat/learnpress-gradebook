@@ -23,8 +23,6 @@ class WatuProGradeBook {
 		require_once( WATUPRO_GRADEBOOK_PATH . '/vendor/meta-box/meta-box.php');
 		require_once( WATUPRO_GRADEBOOK_PATH . '/src/classes.php');
 
-		WatuProGradeBookClasses::init();
-
 		add_action( 'template_redirect',array('WatuProGradeBook', 'downloadReport'));
 		add_action( 'rwmb_enqueue_scripts', array('WatuProGradeBook', 'script'));
 
@@ -32,6 +30,9 @@ class WatuProGradeBook {
 		add_filter( 'cron_schedules', array('WatuProGradeBook', 'cronSchedule'));
 
 		add_action( 'save_post_gradebook_class', array('WatuProGradeBook', 'savePost'), 10, 3 );
+
+		$obj = new WatuProGradeBookClasses;
+		$obj->init();
 
 	}
 
@@ -121,8 +122,7 @@ class WatuProGradeBook {
 			'datatables-style',
 			WATUPRO_GRADEBOOK_URL . 'assets/datatables/datatables.min.css',
 			array(),
-			'1.10.20',
-			true
+			'1.10.20'
 		);
 
 		// main plugin script
