@@ -200,18 +200,23 @@ class WatuProGradeBookClasses {
 
 	public static function userSelectionSaveFilter( $new, $field ) {
 
+		// don't process if no new users
+		if( empty( $new )) {
+			return $new;
+		}
+
 		$postId = $_POST['post_ID'];
 		$users = get_post_meta( $postId, 'gradebook_class_user_selection' );
+		if( !is_array( $users )) {
+			$users = array();
+		}
 
-		if( is_array( $users )) {
-			$users = array_merge( $users, $new );
-		} else {
-			$users = $new;
+		foreach( $new as $newUserId ) {
+			$users[] = $newUserId;
 		}
 
 		update_post_meta( $postId, 'gradebook_class_user_selection', $users );
-
-		return $new;
+		return array();
 
 	}
 
