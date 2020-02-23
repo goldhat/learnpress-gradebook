@@ -28,7 +28,11 @@ class WatuProGradeBookClasses {
 	}
 
 	public function loadUsers() {
-		$this->users = get_post_meta( $this->postId, 'gradebook_class_user_selection_ordered' );
+		$this->users = $this->getUsers( $this->postId );
+	}
+
+	public function getUsers( $postId ) {
+		return get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
 	}
 
 	public function loadExportFilename() {
@@ -212,8 +216,13 @@ class WatuProGradeBookClasses {
 		}
 
 		foreach( $new as $newUserId ) {
-			$users[] = $newUserId;
+			if( !in_array( $newUserId, $users )) {
+				$users[] = $newUserId;
+			}
 		}
+
+		// weed out any duplicates
+		$users = array_unique( $users );
 
 		update_post_meta( $postId, 'gradebook_class_user_selection_ordered', $users );
 		return array();
@@ -254,32 +263,7 @@ class WatuProGradeBookClasses {
 
 		// make user table
 		$users = get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
-
-		$userRows = '';
-		if( !empty( $users )) {
-			foreach( $users as $uid ) {
-				$userRows .= '<tr>';
-				$userRows .= '<td>'. $uid . '</td>';
-				$userRows .= '</tr>';
-			}
-		} else {
-			$userRows .= '<tr>';
-			$userRows .= '<td>No users currently in gradebook.</td>';
-			$userRows .= '</tr>';
-		}
-
-		$userTable = '
-			<table class="display stripe">
-				<thead>
-					<tr>
-						<th>User ID</th>
-					</tr>
-				</thead>
-				<tbody>
-					' . $userRows . '
-				</tbody>
-			</table>
-		';
+		$userTable = WatuProGradeBookClasses::userTable( $users );
 
 		$meta_boxes[] = array(
 			'id' => 'gradebook_class_metabox',
@@ -332,7 +316,6 @@ class WatuProGradeBookClasses {
 
 		);
 
-/*
 		end( $meta_boxes );
 		$key = key( $meta_boxes );
 
@@ -346,7 +329,6 @@ class WatuProGradeBookClasses {
 				)
 			);
 		}
-*/
 
 		return $meta_boxes;
 
@@ -414,5 +396,43 @@ class WatuProGradeBookClasses {
 
 	}
 
+	public static function userTable( $users ) {
+
+		$userRows = '';
+		if( !empty( $users )) {
+			$rowNumber = 1;
+			foreach( $users as $uid ) {
+				$userRows .= '<tr>';
+				$userRows .= '<td>'. $rowNumber . '</td>';
+				$userRows .= '<td>'. $uid . '</td>';
+				$userRows .= '<td>USERNAME</td>';
+				$userRows .= '</tr>';
+				$rowNumber++;
+			}
+		} else {
+			$userRows .= '<tr>';
+			$userRows .= '<td colspan=3" id="">No users currently in gradebook.</td>';
+			$userRows .= '</tr>';
+		}
+
+		$userTable = '
+			<textarea id="gradebook_classes_user_selection_json" name="gradebook_classes_user_selection_json" style=""></textarea>
+			<table class="display stripe">
+				<thead>
+					<tr>
+						<th>Ordering</th>
+						<th>User ID</th>
+						<th>Username</th>
+					</tr>
+				</thead>
+				<tbody>
+					' . $userRows . '
+				</tbody>
+			</table>
+		';
+
+		return $userTable;
+
+	}
 
 }

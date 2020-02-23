@@ -134,6 +134,19 @@ class WatuProGradeBook {
 			true
 		);
 
+		// localize user list
+		if( isset( $_REQUEST['post'] )) {
+			$postId = $_REQUEST['post'];
+		} else {
+			$postId = false;
+		}
+		if( $postId ) {
+			$gbClass = new WatuProGradeBookClasses;
+			$users = $gbClass->getUsers( $postId );
+			$usersJson = json_encode( $users );
+			$success = wp_localize_script( 'watupro-gradebook', 'gradebookClassesUserJson', $usersJson );
+		}
+
 	}
 
 	public static function downloadReport() {
