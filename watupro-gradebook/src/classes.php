@@ -28,7 +28,7 @@ class WatuProGradeBookClasses {
 	}
 
 	public function loadUsers() {
-		$this->users = rwmb_meta( 'gradebook_class_user_selection', '', $this->postId );
+		$this->users = get_post_meta( $this->postId, 'gradebook_class_user_selection_ordered' );
 	}
 
 	public function loadExportFilename() {
@@ -201,12 +201,12 @@ class WatuProGradeBookClasses {
 	public static function userSelectionSaveFilter( $new, $field ) {
 
 		// don't process if no new users
-		if( empty( $new )) {
+		if( empty( $new ) || !is_array( $new )) {
 			return $new;
 		}
 
 		$postId = $_POST['post_ID'];
-		$users = get_post_meta( $postId, 'gradebook_class_user_selection' );
+		$users = get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
 		if( !is_array( $users )) {
 			$users = array();
 		}
@@ -215,7 +215,7 @@ class WatuProGradeBookClasses {
 			$users[] = $newUserId;
 		}
 
-		update_post_meta( $postId, 'gradebook_class_user_selection', $users );
+		update_post_meta( $postId, 'gradebook_class_user_selection_ordered', $users );
 		return array();
 
 	}
@@ -253,7 +253,8 @@ class WatuProGradeBookClasses {
 		}
 
 		// make user table
-		$users = get_post_meta( $postId, $prefix . 'user_selection' );
+		$users = get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
+
 		$userRows = '';
 		if( !empty( $users )) {
 			foreach( $users as $uid ) {
