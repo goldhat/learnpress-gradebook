@@ -204,10 +204,6 @@ class WatuProGradeBookClasses {
 
 	public static function userSelectionSaveFilter( $new, $field ) {
 
-		$log = [];
-		$log['new'] = $new;
-
-
 		// get users stored
 		$postId = $_POST['post_ID'];
 		$users = get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
@@ -215,13 +211,9 @@ class WatuProGradeBookClasses {
 			$users = array();
 		}
 
-		$log['users at 215'] = $users;
-
 		// get user array passed
 		$usersJson = $_POST['gradebook_classes_user_selection_json'];
 		$users = json_decode( stripslashes( $usersJson) );
-
-		$log['users at 222'] = $users;
 
 		// add new if there are any
 		if( is_array( $new ) && !empty( $new )) {
@@ -232,24 +224,10 @@ class WatuProGradeBookClasses {
 			}
 		}
 
-		$log['users at 235'] = $users;
-
 		// weed out any duplicates
 		$users = array_unique( $users );
 
-		$log['users at 240'] = $users;
-		$log['postId'] = $postId;
-
 		update_post_meta( $postId, 'gradebook_class_user_selection_ordered', $users );
-
-		$bs = get_option( 'gradebook_bullshit' );
-		if( !is_array($bs)) {
-			$bs = [];
-		}
-		$bs[] = $log;
-		update_option( 'gradebook_bullshit', $bs );
-
-
 		return array();
 
 	}
