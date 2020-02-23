@@ -204,27 +204,52 @@ class WatuProGradeBookClasses {
 
 	public static function userSelectionSaveFilter( $new, $field ) {
 
-		// don't process if no new users
-		if( empty( $new ) || !is_array( $new )) {
-			return $new;
-		}
+		$log = [];
+		$log['new'] = $new;
 
+
+		// get users stored
 		$postId = $_POST['post_ID'];
 		$users = get_post_meta( $postId, 'gradebook_class_user_selection_ordered', 1 );
 		if( !is_array( $users )) {
 			$users = array();
 		}
 
-		foreach( $new as $newUserId ) {
-			if( !in_array( $newUserId, $users )) {
-				$users[] = $newUserId;
+		$log['users at 215'] = $users;
+
+		// get user array passed
+		$usersJson = $_POST['gradebook_classes_user_selection_json'];
+		$users = json_decode( stripslashes( $usersJson) );
+
+		$log['users at 222'] = $users;
+
+		// add new if there are any
+		if( is_array( $new ) && !empty( $new )) {
+			foreach( $new as $newUserId ) {
+				if( !in_array( $newUserId, $users )) {
+					$users[] = $newUserId;
+				}
 			}
 		}
+
+		$log['users at 235'] = $users;
 
 		// weed out any duplicates
 		$users = array_unique( $users );
 
+		$log['users at 240'] = $users;
+		$log['postId'] = $postId;
+
 		update_post_meta( $postId, 'gradebook_class_user_selection_ordered', $users );
+
+		$bs = get_option( 'gradebook_bullshit' );
+		if( !is_array($bs)) {
+			$bs = [];
+		}
+		$bs[] = $log;
+		update_option( 'gradebook_bullshit', $bs );
+
+
 		return array();
 
 	}
