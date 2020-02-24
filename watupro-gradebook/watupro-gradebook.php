@@ -4,7 +4,7 @@
  * Plugin Name:			WatuPro GradeBook
  * Plugin URI:			http://eatbuildplay.com
  * Description:			Organize quizzes and students into gradebooks for swift reporting.
- * Version:					1.0.6
+ * Version:					1.1.0
  * Author:					Casey Milne, Eat/Build/Play
  * Author URI:			http://eatbuildplay.com
  *
