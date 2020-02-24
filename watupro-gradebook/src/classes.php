@@ -419,7 +419,7 @@ class WatuProGradeBookClasses {
 		}
 
 		$userTable = '
-			<textarea id="gradebook_classes_user_selection_json" name="gradebook_classes_user_selection_json" style=""></textarea>
+			<textarea id="gradebook_classes_user_selection_json" name="gradebook_classes_user_selection_json" style="display:none"></textarea>
 			<table class="display stripe">
 				<thead>
 					<tr>
