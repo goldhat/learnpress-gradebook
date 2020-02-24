@@ -113,7 +113,13 @@ class WatuProGradeBookClasses {
 		if( empty( $report )) {
 			$this->reportStart();
 		}
-		$this->reportAddLine();
+
+		$count = 1;
+		while(($incomplete && $count <= 10)) {
+			$incompete = $this->reportAddLine();
+			$count++;
+		}
+
 	}
 
 	/*
@@ -141,12 +147,13 @@ class WatuProGradeBookClasses {
 
 		if( $reportRowCount >= $userCount ) {
 			update_post_meta($this->postId, 'gradebook_report_complete', 1);
-			return;
+			return false;
 		}
 		else {
 			$nextUserId = $this->users[ $reportRowCount ];
 			$report[] = $this->reportUserRow( $nextUserId );
 			update_post_meta( $this->postId, 'gradebook_report', $report );
+			return true;
 		}
 
 	}
@@ -405,16 +412,18 @@ class WatuProGradeBookClasses {
 		if( !empty( $users )) {
 			$rowNumber = 1;
 			foreach( $users as $uid ) {
+				$userData = get_userdata( $uid );
 				$userRows .= '<tr>';
 				$userRows .= '<td>'. $rowNumber . '</td>';
 				$userRows .= '<td>'. $uid . '</td>';
-				$userRows .= '<td>USERNAME</td>';
+				$userRows .= '<td>' . $userData->user_login . '</td>';
+				$userRows .= '<td><button class="gb-delete">Delete</button></td>';
 				$userRows .= '</tr>';
 				$rowNumber++;
 			}
 		} else {
 			$userRows .= '<tr>';
-			$userRows .= '<td colspan=3" id="">No users currently in gradebook.</td>';
+			$userRows .= '<td colspan="4">No users currently in gradebook.</td>';
 			$userRows .= '</tr>';
 		}
 
@@ -426,6 +435,7 @@ class WatuProGradeBookClasses {
 						<th>Ordering</th>
 						<th>User ID</th>
 						<th>Username</th>
+						<th>&nbsp;</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -72,6 +72,7 @@ class WatuProGradeBook {
 		// do reporting
 		$gbc = new WatuProGradeBookClasses;
 		$gbc->setPostId( $gradebook->ID );
+
 		$gbc->reportBuild();
 
 	}
