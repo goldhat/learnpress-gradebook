@@ -198,7 +198,7 @@ class WatuProGradeBookClasses {
 
 		global $wpdb;
 		$results = $wpdb->get_row(
-			$wpdb->prepare("SELECT tak.percent_correct FROM wp_watupro_taken_exams AS tak
+			$wpdb->prepare("SELECT tak.percent_points FROM wp_watupro_taken_exams AS tak
 			WHERE tak.user_id=%d
 			AND tak.exam_id=%d
 			ORDER BY tak.percent_correct DESC LIMIT 1",
