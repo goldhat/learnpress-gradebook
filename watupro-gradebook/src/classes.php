@@ -111,12 +111,14 @@ class WatuProGradeBookClasses {
 		$report = get_post_meta( $this->postId, 'gradebook_report', 1 );
 		// add header if report currently empty
 		if( empty( $report )) {
+			watuproGradebookLog('test2', 'Report was empty, starting report with header row.');
 			$this->reportStart();
 		}
 
 		$count = 1;
+		$incomplete = true;
 		while(($incomplete && $count <= 10)) {
-			$incompete = $this->reportAddLine();
+			$incomplete = $this->reportAddLine();
 			$count++;
 		}
 

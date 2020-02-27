@@ -15,6 +15,7 @@
 
 define('WATUPRO_GRADEBOOK_PATH', plugin_dir_path( __FILE__ ));
 define('WATUPRO_GRADEBOOK_URL', plugin_dir_url( __FILE__ ));
+define('WATUPRO_GRADEBOOK_LOG_KEY', '_watupro_gradebook_log');
 
 class WatuProGradeBook {
 
@@ -54,6 +55,8 @@ class WatuProGradeBook {
 		);
 		$gradebooks = get_posts( $args );
 
+		watuproGradebookLog( 'gradebooks', $gradebooks );
+
 		// get one gradebook to report
 		$reportingGradebook = false;
 		foreach( $gradebooks as $gradebook ) {
@@ -64,15 +67,17 @@ class WatuProGradeBook {
 			}
 		}
 
+		watuproGradebookLog( 'reporting', $reportingGradebook );
+
 		// check if no gradebooks to report
 		if( !$reportingGradebook ) {
+			watuproGradebookLog('test1', 'no gradebooks found to report 75.');
 			return;
 		}
 
 		// do reporting
 		$gbc = new WatuProGradeBookClasses;
-		$gbc->setPostId( $gradebook->ID );
-
+		$gbc->setPostId( $reportingGradebook->ID );
 		$gbc->reportBuild();
 
 	}
@@ -171,3 +176,20 @@ new WatuProGradeBook;
  */
 register_activation_hook( WATUPRO_GRADEBOOK_PATH . '/watupro-gradebook.php', array('WatuProGradeBook', 'initCronSchedule'));
 register_deactivation_hook( WATUPRO_GRADEBOOK_PATH . '/watupro-gradebook.php', array('WatuProGradeBook', 'removeCronSchedule'));
+
+
+function watuproGradebookLog( $key, $data ) {
+	$log = get_option( WATUPRO_GRADEBOOK_LOG_KEY, [] );
+	if( !is_array( $log )) {
+		$log = [];
+	}
+	$log[ $key ] = $data;
+	update_option( WATUPRO_GRADEBOOK_LOG_KEY, $log );
+}
+
+function watuproGradebookLogShow() {
+	print '<pre>';
+	var_dump( get_option( WATUPRO_GRADEBOOK_LOG_KEY ));
+	print '</pre>';
+	update_option( WATUPRO_GRADEBOOK_LOG_KEY, [] );
+}
