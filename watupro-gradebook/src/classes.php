@@ -65,7 +65,7 @@ class WatuProGradeBookClasses {
 		foreach( $this->exams as $examId ) {
 			$examResult = $this->fetchExamResultUser( $userId, $examId );
 			if( $examResult ) {
-				$csvRow[] = $examResult->percent_correct;
+				$csvRow[] = $examResult->percent_points;
 			} else {
 				$csvRow[] = '-';
 			}
@@ -201,7 +201,7 @@ class WatuProGradeBookClasses {
 			$wpdb->prepare("SELECT tak.percent_points FROM wp_watupro_taken_exams AS tak
 			WHERE tak.user_id=%d
 			AND tak.exam_id=%d
-			ORDER BY tak.percent_correct DESC LIMIT 1",
+			ORDER BY tak.percent_points DESC LIMIT 1",
 			$userId, $examId
 		));
 		if( empty( $results )) {
