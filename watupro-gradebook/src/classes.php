@@ -117,7 +117,8 @@ class WatuProGradeBookClasses {
 
 		$count = 1;
 		$incomplete = true;
-		while(($incomplete && $count <= 10)) {
+		$rows_per_run = get_option('watupro_gradebook_rows_per_run', 10);
+		while(($incomplete && $count <= $rows_per_run)) {
 			$incomplete = $this->reportAddLine();
 			$count++;
 		}
