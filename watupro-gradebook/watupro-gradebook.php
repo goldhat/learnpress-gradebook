@@ -4,7 +4,7 @@
  * Plugin Name:			WatuPro GradeBook
  * Plugin URI:			http://eatbuildplay.com
  * Description:			Organize quizzes and students into gradebooks for swift reporting.
- * Version:					1.1.1
+ * Version:					1.1.2
  * Author:					Casey Milne, Eat/Build/Play
  * Author URI:			http://eatbuildplay.com
  *
@@ -22,6 +22,7 @@ class WatuProGradeBook {
 	public function __construct() {
 
 		require_once( WATUPRO_GRADEBOOK_PATH . '/vendor/meta-box/meta-box.php');
+		require_once( WATUPRO_GRADEBOOK_PATH . '/src/admin.php');
 		require_once( WATUPRO_GRADEBOOK_PATH . '/src/classes.php');
 
 		add_action( 'template_redirect',array('WatuProGradeBook', 'downloadReport'));
@@ -31,6 +32,8 @@ class WatuProGradeBook {
 		add_filter( 'cron_schedules', array('WatuProGradeBook', 'cronSchedule'));
 
 		add_action( 'save_post_gradebook_class', array('WatuProGradeBook', 'savePost'), 10, 3 );
+
+		new WatuProGradeBookAdmin();
 
 		$obj = new WatuProGradeBookClasses;
 		$obj->init();
